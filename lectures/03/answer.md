@@ -15,7 +15,7 @@ def make_quiz(lecture: int) -> str:
     """
     # 1. load_glossary() から lecture が一致する用語を集める
     # 2. 1 つ選ぶ（random.choice）
-    # 3. 問題と答えを文字列で返す（json.dumps など
+    # 3. 問題と答えを文字列で返す（json.dumps など）
 
 ## 宿題
 
