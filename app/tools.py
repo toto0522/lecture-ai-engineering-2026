@@ -80,6 +80,35 @@ def get_lecture_summary(lecture: int) -> str:
         return f"第{lecture}回の要点はまだありません。用意されている回: {', '.join(available)}"
     return path.read_text(encoding="utf-8")
 
+def make_quiz(lecture: int) -> str:
+    """指定した回（1始まりの整数）の講義内容から確認クイズを作成するための資料を返す。
+
+    「第3回のクイズを作って」「第2回の確認問題を出して」のように、
+    特定の回のクイズや問題作成を求められたときに使う。
+    """
+    available = sorted(p.stem for p in (DATA_DIR / "lectures").glob("*.md"))
+    path = DATA_DIR / "lectures" / f"{lecture:02d}.md"
+    if not path.exists():
+        return (
+            f"エラー: 第{lecture}回の講義データは存在しないためクイズを作れません。"
+            f"指定できる有効な回番号（1始まりの整数）は [{', '.join(available)}] です。"
+        )
+
+    summary = path.read_text(encoding="utf-8")
+    terms = [
+        {"term": e["term"], "definition": e["definition"]}
+        for e in load_glossary()
+        if e.get("lecture") == lecture
+    ]
+    return json.dumps(
+        {
+            "lecture": lecture,
+            "summary": summary,
+            "glossary_terms": terms,
+            "instruction": "この講義の要点と用語をもとに、選択式の確認クイズを1問作成してください。",
+        },
+        ensure_ascii=False,
+    )
 
 def search_materials(query: str) -> str:
     """第1〜3回の本講義資料を検索し、関連ページの本文・タイトル・ページ番号を返す。
